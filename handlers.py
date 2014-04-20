@@ -19,32 +19,17 @@ class Updates(webapp2.RequestHandler):
         try:
 
             for update in json.loads(self.request.body):
+                fields = {}
+                fields['android'] = int(android)
+                fields['device'] = device
+                fields['country'] = self.request.headers['X-AppEngine-Country']
+                fields['package'] = update['pname']
+                fields['vercode'] = int(update['vcode'])
+                fields['signature'] = update['cert_sig']
+                fields['checksum'] = update['apk_sha1']
 
-                query = models.Application.all()
-                query.filter('uniqid =', uniqid)
-                query.filter('android =', int(android))
-                query.filter('device =', device)
-                query.filter('country =', self.request.headers['X-AppEngine-Country'])
-                query.filter('package =', update['pname'])
-                query.filter('vercode =', int(update['vcode']))
-                query.filter('vername =', update['vname'])
-                query.filter('signature =', update['cert_sig'])
-                query.filter('checksum =', update['apk_sha1'])
-
-                if not query.fetch(1):
-                    fields = {}
-                    fields['uniqid'] = uniqid
-                    fields['android'] = int(android)
-                    fields['device'] = device
-                    fields['country'] = self.request.headers['X-AppEngine-Country']
-                    fields['package'] = update['pname']
-                    fields['vercode'] = int(update['vcode'])
-                    fields['vername'] = update['vname']
-                    fields['signature'] = update['cert_sig']
-                    fields['checksum'] = update['apk_sha1']
-
-                    record = models.Application(**fields)
-                    record.put()
+                rowid = uniqid + update['cert_sig'] + update['apk_sha1']
+                models.Application.get_or_insert(rowid, **fields)
 
         except Exception, e:
             logging.exception('Error saving update %s', update)

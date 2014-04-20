@@ -7,12 +7,10 @@ class Application(db.Model):
     package, the version code of the package, the signature of the package cerfificate, and the SHA1
     checksum of the APK.
     """
-    uniqid = db.StringProperty(required = True)
     android = db.IntegerProperty(required = True)
     device = db.StringProperty(required = True)
     country = db.StringProperty(required = True)
     package = db.StringProperty(required = True)
     vercode = db.IntegerProperty(required = True)
-    vername = db.StringProperty(required = True)
     signature = db.StringProperty(required = True)
     checksum = db.StringProperty(required = True)
